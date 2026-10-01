@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f6f7f2">
 <title>Habit Bloom — Habit Tracker</title>
+
 <style>
 :root{
   --bg:#f6f7f2;--card:#fff;--ink:#273027;--muted:#7b8278;
@@ -83,25 +83,48 @@ canvas{display:block;width:100%;height:100%}
 .plan .btn{width:100%;white-space:normal}
 .notice{margin-top:13px;background:#f5efdf;color:#796745;border-radius:11px;padding:12px;font-size:12px;line-height:1.5}
 footer{text-align:center;color:var(--muted);font-size:12px;padding-top:28px}
-@media(max-width:820px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+@media(max-width:820px){
+.layout{grid-template-columns:1fr}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 @media(max-width:430px){
- .app{padding:15px 11px 30px}.brand{font-size:20px}.tag{font-size:10px;padding:8px}
- .hero{padding-top:24px}.card{padding:15px;border-radius:16px}
- .stats{gap:8px;margin:17px 0}.stat-num{font-size:26px}
- .chart-wrap{height:195px}.donut-wrap{height:150px}
- .plans{gap:7px}.plan{padding:12px}.price{font-size:29px}
- .day{font-size:10px}.month-grid{gap:4px}
+.app{padding:15px 11px 30px}
+.brand{font-size:20px}
+.tag{font-size:10px;padding:8px}
+.hero{padding-top:24px}
+.card{padding:15px;border-radius:16px}
+.stats{gap:8px;margin:17px 0}
+.stat-num{font-size:26px}
+.chart-wrap{height:195px}
+.donut-wrap{height:150px}
+.plans{gap:7px}
+.plan{padding:12px}
+.price{font-size:29px}
+.day{font-size:10px}
+.month-grid{gap:4px}
 }
 </style>
 </head>
+
 <body>
+
 <div class="app">
+
 <header>
   <div class="brand">habit<span>bloom.</span></div>
-  <div class="tag">✦ Grow every day</div>
+
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div class="tag" id="authStatus">Not signed in</div>
+    <button class="btn soft" id="authBtn" type="button" onclick="openAuth()">
+      Login / Sign up
+    </button>
+  </div>
 </header>
 
 <main>
+
 <section class="hero">
   <div class="eyebrow">Your personal growth space</div>
   <h1>Small habits.<br>Meaningful change.</h1>
@@ -110,264 +133,2229 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding-top:28px}
 </section>
 
 <section class="stats">
-  <div class="card"><div class="stat-label">Today's progress</div><div class="stat-num" id="todayPct">0%</div><div class="small" id="todayCount">0 habits done</div></div>
-  <div class="card"><div class="stat-label">Current streak 🔥</div><div class="stat-num" id="streak">0</div><div class="small">complete days in a row</div></div>
-  <div class="card"><div class="stat-label">Monthly progress</div><div class="stat-num" id="monthPct">0%</div><div class="small">of planned habit check-ins</div></div>
-  <div class="card"><div class="stat-label">Your habits</div><div class="stat-num" id="totalHabits">4</div><div class="small">active routines</div></div>
+
+  <div class="card">
+    <div class="stat-label">Today's progress</div>
+    <div class="stat-num" id="todayPct">0%</div>
+    <div class="small" id="todayCount">0 habits done</div>
+  </div>
+
+  <div class="card">
+    <div class="stat-label">Current streak 🔥</div>
+    <div class="stat-num" id="streak">0</div>
+    <div class="small">complete days in a row</div>
+  </div>
+
+  <div class="card">
+    <div class="stat-label">Monthly progress</div>
+    <div class="stat-num" id="monthPct">0%</div>
+    <div class="small">of planned habit check-ins</div>
+  </div>
+
+  <div class="card">
+    <div class="stat-label">Your habits</div>
+    <div class="stat-num" id="totalHabits">4</div>
+    <div class="small">active routines</div>
+  </div>
+
 </section>
 
 <div class="layout">
-<div class="stack">
-  <section class="card">
-    <div class="head"><div><h2>Today's habits 🌱</h2><div class="small" style="margin-top:5px">Check off what you finish.</div></div><span class="pill" id="todayPill">0 / 4</span></div>
-    <div id="habitList"></div>
-    <form class="add" id="addForm">
-      <input id="habitInput" maxlength="60" placeholder="Add a new habit..." required>
-      <button class="btn primary" type="submit">+ Add</button>
-    </form>
-  </section>
-
-  <section class="card">
-    <div class="head"><div><h2>Daily bar graph</h2><div class="small" style="margin-top:5px">How many habits you completed each day.</div></div><span class="pill">7 days</span></div>
-    <div class="chart-wrap"><canvas id="barChart" role="img" aria-label="Daily habit completion bar chart"></canvas></div>
-    <div class="legend"><span><i class="dot" style="background:#55785e"></i>Habits completed</span></div>
-  </section>
-
-  <section class="card">
-    <div class="head"><div><h2>Progress trend</h2><div class="small" style="margin-top:5px">See your daily performance go up or down.</div></div><span class="pill">30 days</span></div>
-    <div class="chart-wrap"><canvas id="lineChart" role="img" aria-label="Daily progress trend line chart"></canvas></div>
-    <div class="legend"><span><i class="dot" style="background:#55785e"></i>Daily completion percentage</span></div>
-  </section>
-
-  <section class="card">
-    <div class="head"><div><h2>Monthly calendar 📅</h2><div class="small" id="monthLabel" style="margin-top:5px"></div></div><span class="pill" id="monthStatus">In progress</span></div>
-    <div class="month-grid" id="calendar"></div>
-    <div class="legend">
-      <span><i class="dot" style="background:#55785e"></i>All done</span>
-      <span><i class="dot" style="background:#f5dfda"></i>Not all done</span>
-      <span><i class="dot" style="background:#eff0eb"></i>Future</span>
-    </div>
-    <div class="small" style="margin-top:12px">A day is complete when every active habit is checked. Future days are not counted as missed.</div>
-  </section>
-</div>
 
 <div class="stack">
-  <section class="card">
-    <div class="head"><div><h2>Monthly circular progress</h2><div class="small" style="margin-top:5px">Your overall completion this month.</div></div></div>
-    <div class="donut-wrap"><canvas id="ringChart" role="img" aria-label="Circular monthly completion progress"></canvas><div class="donut-center"><strong id="ringPct">0%</strong><span>completed</span></div></div>
-    <div class="progress" style="margin-top:12px"><div class="fill" id="monthFill" style="width:0%"></div></div>
-    <div class="small" id="monthDetail" style="margin-top:9px">0 of 0 check-ins complete</div>
-  </section>
 
-  <section class="card">
-    <div class="head"><div><h2>Completed vs missed</h2><div class="small" style="margin-top:5px">Check-ins recorded this month.</div></div></div>
-    <div class="donut-layout">
-      <div class="donut-wrap"><canvas id="donutChart" role="img" aria-label="Completed and incomplete habit check-ins donut chart"></canvas><div class="donut-center"><strong id="donutTotal">0</strong><span>check-ins</span></div></div>
-      <div class="legend-list">
-        <div><div class="legend-item"><span><i class="dot" style="background:#55785e"></i>Completed</span><strong id="doneNum">0</strong></div></div>
-        <div><div class="legend-item"><span><i class="dot" style="background:#d88b7f"></i>Incomplete</span><strong id="missNum">0</strong></div><div class="small" style="margin-top:5px">Past and current days only</div></div>
-      </div>
+<section class="card">
+
+<div class="head">
+  <div>
+    <h2>Today's habits 🌱</h2>
+    <div class="small" style="margin-top:5px">
+      Check off what you finish.
     </div>
-  </section>
+  </div>
 
-  <section class="card">
-    <div class="head"><div><h2>Each habit's monthly result</h2><div class="small" style="margin-top:5px">Check how often each routine was done.</div></div></div>
-    <div id="habitReport"></div>
-  </section>
+  <span class="pill" id="todayPill">0 / 4</span>
+</div>
 
-  <section class="card">
-    <div class="head"><h2>Choose your plan ✨</h2></div>
-    <p class="small" style="margin-top:-5px">One-time payment for a fixed access period.</p>
-    <div class="plans">
-      <div class="plan">
-        <div class="plan-label">6 MONTHS</div><h3>Half-year plan</h3>
-        <div class="price">₹69</div><div class="small">One-time payment</div>
-        <ul><li>6 months access</li><li>Habit tracking</li><li>Graphs and reports</li></ul>
-        <button class="btn soft" onclick="selectPlan('6 months','₹69')">Choose plan</button>
-      </div>
-      <div class="plan best">
-        <div class="plan-label">12 MONTHS</div><h3>Yearly plan</h3>
-        <div class="price">₹79</div><div class="small">One-time payment</div>
-        <ul><li>12 months access</li><li>Habit tracking</li><li>Graphs and reports</li></ul>
-        <button class="btn primary" onclick="selectPlan('1 year','₹79')">Choose plan</button>
-      </div>
+<div id="habitList"></div>
+
+<form class="add" id="addForm">
+  <input id="habitInput" maxlength="60"
+  placeholder="Add a new habit..." required>
+
+  <button class="btn primary" type="submit">
+    + Add
+  </button>
+</form>
+
+</section>
+
+<section class="card">
+
+<div class="head">
+  <div>
+    <h2>Daily bar graph</h2>
+    <div class="small" style="margin-top:5px">
+      How many habits you completed each day.
     </div>
-    <div class="notice" id="planNotice">Demo only: payment is not connected. Choosing a plan will not charge money or unlock paid access.</div>
-  </section>
+  </div>
+
+  <span class="pill">7 days</span>
+</div>
+
+<div class="chart-wrap">
+  <canvas id="barChart" role="img"
+  aria-label="Daily habit completion bar chart"></canvas>
+</div>
+
+<div class="legend">
+<span>
+<i class="dot" style="background:#55785e"></i>
+Habits completed
+</span>
+</div>
+
+</section>
+
+<section class="card">
+
+<div class="head">
+  <div>
+    <h2>Progress trend</h2>
+    <div class="small" style="margin-top:5px">
+      See your daily performance go up or down.
+    </div>
+  </div>
+
+  <span class="pill">30 days</span>
+</div>
+
+<div class="chart-wrap">
+  <canvas id="lineChart" role="img"
+  aria-label="Daily progress trend line chart"></canvas>
+</div>
+
+<div class="legend">
+<span>
+<i class="dot" style="background:#55785e"></i>
+Daily completion percentage
+</span>
+</div>
+
+</section>
+
+<section class="card">
+
+<div class="head">
+
+<div>
+<h2>Monthly calendar 📅</h2>
+
+<div class="small" id="monthLabel"
+style="margin-top:5px"></div>
+
+</div>
+
+<span class="pill" id="monthStatus">
+In progress
+</span>
+
+</div>
+
+<div class="month-grid" id="calendar"></div>
+
+<div class="legend">
+
+<span>
+<i class="dot" style="background:#55785e"></i>
+All done
+</span>
+
+<span>
+<i class="dot" style="background:#f5dfda"></i>
+Not all done
+</span>
+
+<span>
+<i class="dot" style="background:#eff0eb"></i>
+Future
+</span>
+
+</div>
+
+<div class="small" style="margin-top:12px">
+A day is complete when every active habit is checked.
+Future days are not counted as missed.
+</div>
+
+</section>
+
+</div>
+
+
+<div class="stack">
+
+<section class="card">
+
+<div class="head">
+
+<div>
+<h2>Monthly circular progress</h2>
+
+<div class="small" style="margin-top:5px">
+Your overall completion this month.
+</div>
+
+</div>
+
+</div>
+
+<div class="donut-wrap">
+
+<canvas id="ringChart" role="img"
+aria-label="Circular monthly completion progress"></canvas>
+
+<div class="donut-center">
+<strong id="ringPct">0%</strong>
+<span>completed</span>
+</div>
+
+</div>
+
+<div class="progress" style="margin-top:12px">
+<div class="fill" id="monthFill" style="width:0%"></div>
+</div>
+
+<div class="small" id="monthDetail"
+style="margin-top:9px">
+0 of 0 check-ins complete
+</div>
+
+</section>
+
+
+<section class="card">
+
+<div class="head">
+
+<div>
+<h2>Completed vs missed</h2>
+
+<div class="small" style="margin-top:5px">
+Check-ins recorded this month.
+</div>
+
+</div>
+
+</div>
+
+<div class="donut-layout">
+
+<div class="donut-wrap">
+
+<canvas id="donutChart" role="img"
+aria-label="Completed and incomplete habit check-ins donut chart"></canvas>
+
+<div class="donut-center">
+<strong id="donutTotal">0</strong>
+<span>check-ins</span>
+</div>
+
+</div>
+
+<div class="legend-list">
+
+<div>
+<div class="legend-item">
+<span>
+<i class="dot" style="background:#55785e"></i>
+Completed
+</span>
+
+<strong id="doneNum">0</strong>
+
 </div>
 </div>
+
+<div>
+
+<div class="legend-item">
+
+<span>
+<i class="dot" style="background:#d88b7f"></i>
+Incomplete
+</span>
+
+<strong id="missNum">0</strong>
+
+</div>
+
+<div class="small" style="margin-top:5px">
+Past and current days only
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="card">
+
+<div class="head">
+
+<div>
+<h2>Each habit's monthly result</h2>
+
+<div class="small" style="margin-top:5px">
+Check how often each routine was done.
+</div>
+
+</div>
+
+</div>
+
+<div id="habitReport"></div>
+
+</section>
+
+
+<section class="card">
+
+<div class="head">
+<h2>Choose your plan ✨</h2>
+</div>
+
+<p class="small" style="margin-top:-5px">
+One-time payment for a fixed access period.
+</p>
+
+<div class="plans">
+
+<div class="plan">
+
+<div class="plan-label">6 MONTHS</div>
+
+<h3>Half-year plan</h3>
+
+<div class="price">₹69</div>
+
+<div class="small">One-time payment</div>
+
+<ul>
+<li>6 months access</li>
+<li>Habit tracking</li>
+<li>Graphs and reports</li>
+</ul>
+
+<button class="btn soft"
+onclick="selectPlan('6 months','₹69')">
+Choose plan
+</button>
+
+</div>
+
+
+<div class="plan best">
+
+<div class="plan-label">12 MONTHS</div>
+
+<h3>Yearly plan</h3>
+
+<div class="price">₹79</div>
+
+<div class="small">One-time payment</div>
+
+<ul>
+<li>12 months access</li>
+<li>Habit tracking</li>
+<li>Graphs and reports</li>
+</ul>
+
+<button class="btn primary"
+onclick="selectPlan('1 year','₹79')">
+Choose plan
+</button>
+
+</div>
+
+</div>
+
+<div class="notice" id="planNotice">
+Demo only: payment is not connected.
+Choosing a plan will not charge money or unlock paid access.
+</div>
+
+</section>
+
+</div>
+</div>
+
 </main>
-<footer>Habit Bloom · Grow at your own pace 🌿</footer>
+
+
+<!-- AUTH MODAL -->
+
+<div id="authModal"
+style="display:none;position:fixed;inset:0;background:#27302766;
+z-index:9999;padding:18px;align-items:center;justify-content:center">
+
+<div class="card"
+style="width:min(420px,100%);position:relative">
+
+<button type="button"
+onclick="closeAuth()"
+style="position:absolute;right:14px;top:10px;border:0;
+background:transparent;font-size:22px;color:#7b8278">
+×
+</button>
+
+<div class="head">
+
+<div>
+
+<h2 id="authTitle">Login</h2>
+
+<div class="small" style="margin-top:5px">
+Save your Habit Bloom account securely.
 </div>
+
+</div>
+
+</div>
+
+
+<form id="authForm">
+
+<input
+id="authEmail"
+type="email"
+autocomplete="email"
+placeholder="Email address"
+required
+style="margin-bottom:9px">
+
+<input
+id="authPassword"
+type="password"
+autocomplete="current-password"
+minlength="6"
+placeholder="Password"
+required>
+
+<button
+class="btn primary"
+id="authSubmit"
+type="submit"
+style="width:100%;margin-top:12px">
+Login
+</button>
+
+</form>
+
+
+<button
+class="btn soft"
+id="authSwitch"
+type="button"
+style="width:100%;margin-top:8px">
+Create a new account
+</button>
+
+<div
+class="small"
+id="authMessage"
+style="margin-top:10px">
+</div>
+
+</div>
+</div>
+
+
+<footer>
+Habit Bloom · Grow at your own pace 🌿
+</footer>
+
+</div>
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+
+const SUPABASE_URL =
+'https://xxqjjuzopvdtwwrxglpc.supabase.co';
+
+const SUPABASE_PUBLISHABLE_KEY =
+'sb_publishable_03kiT40z93pC6Ozd7F5fHw_GMdn7EhP';
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
 const $=id=>document.getElementById(id);
+
+
+/* =========================
+   AUTH
+========================= */
+
+let authMode='login';
+
+
+function openAuth(mode='login'){
+
+  authMode=mode;
+
+  $('authTitle').textContent =
+    authMode==='login'
+    ? 'Login'
+    : 'Create account';
+
+  $('authSubmit').textContent =
+    authMode==='login'
+    ? 'Login'
+    : 'Sign up';
+
+  $('authSwitch').textContent =
+    authMode==='login'
+    ? 'Create a new account'
+    : 'Already have an account? Login';
+
+  $('authMessage').textContent='';
+
+  $('authModal').style.display='flex';
+}
+
+
+function closeAuth(){
+
+  $('authModal').style.display='none';
+
+}
+
+
+async function submitAuth(e){
+
+  e.preventDefault();
+
+  const email =
+    $('authEmail').value.trim();
+
+  const password =
+    $('authPassword').value;
+
+  $('authMessage').textContent =
+    'Please wait...';
+
+
+  const result =
+    authMode==='login'
+
+    ? await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      })
+
+    : await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+
+  if(result.error){
+
+    $('authMessage').textContent =
+      result.error.message;
+
+    return;
+
+  }
+
+
+  if(authMode==='login'){
+
+    $('authMessage').textContent =
+      'Logged in successfully.';
+
+    setTimeout(closeAuth,500);
+
+  }else{
+
+    $('authMessage').textContent =
+      'Account created. Check your email to confirm your account, then log in.';
+
+  }
+
+}
+
+
+async function refreshAuthUI(){
+
+  const {data} =
+    await supabaseClient.auth.getUser();
+
+  const user=data?.user;
+
+
+  if(user){
+
+    $('authStatus').textContent =
+      user.email;
+
+    $('authBtn').textContent =
+      'Logout';
+
+
+    $('authBtn').onclick =
+      async()=>{
+
+        await supabaseClient.auth.signOut();
+
+        refreshAuthUI();
+
+      };
+
+  }else{
+
+    $('authStatus').textContent =
+      'Not signed in';
+
+    $('authBtn').textContent =
+      'Login / Sign up';
+
+    $('authBtn').onclick =
+      ()=>openAuth('login');
+
+  }
+
+}
+
+
+$('authForm')
+.addEventListener(
+  'submit',
+  submitAuth
+);
+
+
+$('authSwitch')
+.addEventListener(
+  'click',
+  ()=>{
+    openAuth(
+      authMode==='login'
+      ? 'signup'
+      : 'login'
+    );
+  }
+);
+
+
+supabaseClient.auth.onAuthStateChange(
+  ()=>{
+    refreshAuthUI();
+  }
+);
+
+
+/* =========================
+   HABIT TRACKER
+========================= */
+
 const now=new Date();
-const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+
+const key=d =>
+  d.getFullYear()+'-'+
+  String(d.getMonth()+1).padStart(2,'0')+'-'+
+  String(d.getDate()).padStart(2,'0');
+
 const todayKey=key(now);
-const year=now.getFullYear(),month=now.getMonth(),dayNo=now.getDate();
-const daysInMonth=new Date(year,month+1,0).getDate();
+
+const year=now.getFullYear();
+const month=now.getMonth();
+const dayNo=now.getDate();
+
+const daysInMonth =
+  new Date(year,month+1,0).getDate();
+
+
 let habits=[
- {id:1,name:'Drink 8 glasses of water',icon:'💧'},
- {id:2,name:'Read for 15 minutes',icon:'📚'},
- {id:3,name:'Move your body',icon:'🏃'},
- {id:4,name:'Sleep on time',icon:'🌙'}
+ {
+  id:1,
+  name:'Drink 8 glasses of water',
+  icon:'💧'
+ },
+ {
+  id:2,
+  name:'Read for 15 minutes',
+  icon:'📚'
+ },
+ {
+  id:3,
+  name:'Move your body',
+  icon:'🏃'
+ },
+ {
+  id:4,
+  name:'Sleep on time',
+  icon:'🌙'
+ }
 ];
-let records={},nextId=5;
+
+
+let records={};
+let nextId=5;
+
+
 try{
- const old=JSON.parse(localStorage.getItem('habitBloomCharts')||'{}');
- if(Array.isArray(old.habits)&&old.habits.length)habits=old.habits;
- if(old.records&&typeof old.records==='object')records=old.records;
- if(Number.isInteger(old.nextId))nextId=old.nextId;
+
+  const old =
+    JSON.parse(
+      localStorage.getItem(
+        'habitBloomCharts'
+      ) || '{}'
+    );
+
+  if(
+    Array.isArray(old.habits) &&
+    old.habits.length
+  )
+    habits=old.habits;
+
+  if(
+    old.records &&
+    typeof old.records==='object'
+  )
+    records=old.records;
+
+  if(
+    Number.isInteger(old.nextId)
+  )
+    nextId=old.nextId;
+
 }catch(e){}
-$('dateText').textContent=now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-$('monthLabel').textContent=now.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+
+
+$('dateText').textContent =
+  now.toLocaleDateString(
+    undefined,
+    {
+      weekday:'long',
+      month:'long',
+      day:'numeric',
+      year:'numeric'
+    }
+  );
+
+
+$('monthLabel').textContent =
+  now.toLocaleDateString(
+    undefined,
+    {
+      month:'long',
+      year:'numeric'
+    }
+  );
+
 
 function save(){
- try{localStorage.setItem('habitBloomCharts',JSON.stringify({habits,records,nextId}));}
- catch(e){alert('Could not save in this browser. Check browser storage settings.');}
+
+  try{
+
+    localStorage.setItem(
+      'habitBloomCharts',
+      JSON.stringify({
+        habits,
+        records,
+        nextId
+      })
+    );
+
+  }catch(e){
+
+    alert(
+      'Could not save in this browser. Check browser storage settings.'
+    );
+
+  }
+
 }
-function isDone(id,k=todayKey){return !!(records[k]&&records[k][id]===true);}
-function counts(k){let n=habits.filter(h=>isDone(h.id,k)).length;return {done:n,total:habits.length,all:habits.length>0&&n===habits.length};}
+
+
+function isDone(
+  id,
+  k=todayKey
+){
+
+  return !!(
+    records[k] &&
+    records[k][id]===true
+  );
+
+}
+
+
+function counts(k){
+
+  let n =
+    habits.filter(
+      h=>isDone(h.id,k)
+    ).length;
+
+  return {
+    done:n,
+    total:habits.length,
+    all:
+      habits.length>0 &&
+      n===habits.length
+  };
+
+}
+
+
 function toggle(id){
- if(!records[todayKey])records[todayKey]={};
- records[todayKey][id]=!isDone(id);save();render();
+
+  if(!records[todayKey])
+    records[todayKey]={};
+
+  records[todayKey][id]=
+    !isDone(id);
+
+  save();
+
+  render();
+
 }
+
+
 function renderHabits(){
- const list=$('habitList');list.innerHTML='';
- habits.forEach(h=>{
-  const row=document.createElement('div');row.className='habit';
-  const btn=document.createElement('button');const d=isDone(h.id);
-  btn.className='check'+(d?' done':'');btn.textContent=d?'✓':'';
-  btn.setAttribute('aria-label','Toggle '+h.name);btn.onclick=()=>toggle(h.id);
-  const info=document.createElement('div');info.className='habit-info';
-  const name=document.createElement('div');name.className='habit-name';name.textContent=h.icon+' '+h.name;
-  const sub=document.createElement('div');sub.className='habit-sub';sub.textContent=d?'Completed today ✓':'Not completed yet';
-  info.append(name,sub);
-  const del=document.createElement('button');del.className='remove';del.textContent='×';del.title='Delete habit';
-  del.onclick=()=>{if(confirm('Delete this habit? Its historical report will no longer include it.')){habits=habits.filter(x=>x.id!==h.id);save();render();}};
-  row.append(btn,info,del);list.appendChild(row);
- });
-}
-function renderStats(){
- const c=counts(todayKey),pct=c.total?Math.round(c.done/c.total*100):0;
- $('todayPct').textContent=pct+'%';$('todayCount').textContent=c.done+' of '+c.total+' done';
- $('todayPill').textContent=c.done+' / '+c.total;$('totalHabits').textContent=c.total;
- let streak=0;
- for(let i=0;i<370;i++){let d=new Date(now);d.setDate(now.getDate()-i);if(counts(key(d)).all)streak++;else break;}
- $('streak').textContent=streak;
-}
-function monthData(){
- let complete=0,incomplete=0,all=0,possible=0;
- for(let d=1;d<=dayNo;d++){
-  let k=key(new Date(year,month,d)),c=counts(k);
-  possible+=c.total;all+=c.done;
-  if(c.all)complete++;else if(c.total)incomplete++;
- }
- return {complete,incomplete,done:all,possible,pct:possible?Math.round(all/possible*100):0};
-}
-function drawCanvas(id,draw){
- const canvas=$(id),rect=canvas.getBoundingClientRect(),ctx=canvas.getContext('2d');
- const w=Math.max(220,rect.width),h=Math.max(130,rect.height),dpr=Math.min(window.devicePixelRatio||1,2);
- canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
- ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
- draw(ctx,w,h);
-}
-function drawRing(ctx,w,h,pct,color){
- const size=Math.min(w*.67,h*.78),r=size/2-6,cx=w/2,cy=h/2;
- ctx.lineWidth=12;ctx.lineCap='round';ctx.strokeStyle='#edf0e9';
- ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
- if(pct>0){ctx.strokeStyle=color;ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*pct/100);ctx.stroke();}
-}
-function drawBars(){
- drawCanvas('barChart',(ctx,w,h)=>{
-  const left=28,right=8,top=12,bottom=27,pw=w-left-right,ph=h-top-bottom;
-  const values=[];
-  for(let i=6;i>=0;i--){let d=new Date(now);d.setDate(now.getDate()-i);values.push({d,c:counts(key(d))});}
-  const max=Math.max(1,habits.length),steps=4;
-  ctx.font='10px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
-  for(let i=0;i<=steps;i++){let y=top+ph*i/steps;ctx.strokeStyle='#edf0e9';ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();ctx.fillStyle='#899087';ctx.fillText(String(Math.round(max*(1-i/steps))),left-6,y);}
-  const slot=pw/7,bw=Math.min(23,slot*.57);
-  values.forEach((v,i)=>{
-   const bh=ph*v.c.done/max,x=left+i*slot+(slot-bw)/2,y=top+ph-bh;
-   ctx.fillStyle=key(v.d)===todayKey?'#55785e':'#9db59b';
-   if(bh>0){ctx.beginPath();ctx.roundRect(x,y,bw,bh,4);ctx.fill();}
-   ctx.fillStyle='#7b8278';ctx.textAlign='center';ctx.textBaseline='top';
-   ctx.fillText(['S','M','T','W','T','F','S'][v.d.getDay()],x+bw/2,h-bottom+8);
+
+  const list=$('habitList');
+
+  list.innerHTML='';
+
+
+  habits.forEach(h=>{
+
+    const row=
+      document.createElement('div');
+
+    row.className='habit';
+
+
+    const btn=
+      document.createElement('button');
+
+    const d=isDone(h.id);
+
+    btn.className=
+      'check'+(d?' done':'');
+
+    btn.textContent=
+      d?'✓':'';
+
+    btn.setAttribute(
+      'aria-label',
+      'Toggle '+h.name
+    );
+
+    btn.onclick=
+      ()=>toggle(h.id);
+
+
+    const info=
+      document.createElement('div');
+
+    info.className='habit-info';
+
+
+    const name=
+      document.createElement('div');
+
+    name.className='habit-name';
+
+    name.textContent=
+      h.icon+' '+h.name;
+
+
+    const sub=
+      document.createElement('div');
+
+    sub.className='habit-sub';
+
+    sub.textContent=
+      d
+      ? 'Completed today ✓'
+      : 'Not completed yet';
+
+
+    info.append(
+      name,
+      sub
+    );
+
+
+    const del=
+      document.createElement('button');
+
+    del.className='remove';
+
+    del.textContent='×';
+
+    del.title='Delete habit';
+
+
+    del.onclick=()=>{
+
+      if(
+        confirm(
+          'Delete this habit? Its historical report will no longer include it.'
+        )
+      ){
+
+        habits=
+          habits.filter(
+            x=>x.id!==h.id
+          );
+
+        save();
+
+        render();
+
+      }
+
+    };
+
+
+    row.append(
+      btn,
+      info,
+      del
+    );
+
+    list.appendChild(row);
+
   });
- });
+
 }
+
+
+function renderStats(){
+
+  const c=
+    counts(todayKey);
+
+  const pct=
+    c.total
+    ? Math.round(
+        c.done/c.total*100
+      )
+    : 0;
+
+
+  $('todayPct').textContent=
+    pct+'%';
+
+  $('todayCount').textContent=
+    c.done+' of '+c.total+' done';
+
+  $('todayPill').textContent=
+    c.done+' / '+c.total;
+
+  $('totalHabits').textContent=
+    c.total;
+
+
+  let streak=0;
+
+
+  for(
+    let i=0;
+    i<370;
+    i++
+  ){
+
+    let d=
+      new Date(now);
+
+    d.setDate(
+      now.getDate()-i
+    );
+
+
+    if(
+      counts(
+        key(d)
+      ).all
+    )
+      streak++;
+
+    else
+      break;
+
+  }
+
+
+  $('streak').textContent=
+    streak;
+
+}
+
+
+function monthData(){
+
+  let complete=0;
+  let incomplete=0;
+  let all=0;
+  let possible=0;
+
+
+  for(
+    let d=1;
+    d<=dayNo;
+    d++
+  ){
+
+    let k=
+      key(
+        new Date(
+          year,
+          month,
+          d
+        )
+      );
+
+    let c=counts(k);
+
+
+    possible+=c.total;
+
+    all+=c.done;
+
+
+    if(c.all)
+      complete++;
+
+    else if(c.total)
+      incomplete++;
+
+  }
+
+
+  return {
+    complete,
+    incomplete,
+    done:all,
+    possible,
+    pct:
+      possible
+      ? Math.round(
+          all/possible*100
+        )
+      : 0
+  };
+
+}
+
+
+function drawCanvas(id,draw){
+
+  const canvas=$(id);
+
+  const rect=
+    canvas.getBoundingClientRect();
+
+  const ctx=
+    canvas.getContext('2d');
+
+
+  const w=
+    Math.max(
+      220,
+      rect.width
+    );
+
+  const h=
+    Math.max(
+      130,
+      rect.height
+    );
+
+  const dpr=
+    Math.min(
+      window.devicePixelRatio||1,
+      2
+    );
+
+
+  canvas.width=
+    Math.round(w*dpr);
+
+  canvas.height=
+    Math.round(h*dpr);
+
+
+  ctx.setTransform(
+    dpr,
+    0,
+    0,
+    dpr,
+    0,
+    0
+  );
+
+  ctx.clearRect(
+    0,
+    0,
+    w,
+    h
+  );
+
+
+  draw(
+    ctx,
+    w,
+    h
+  );
+
+}
+
+
+function drawRing(
+  ctx,
+  w,
+  h,
+  pct,
+  color
+){
+
+  const size=
+    Math.min(
+      w*.67,
+      h*.78
+    );
+
+  const r=
+    size/2-6;
+
+  const cx=w/2;
+  const cy=h/2;
+
+
+  ctx.lineWidth=12;
+
+  ctx.lineCap='round';
+
+  ctx.strokeStyle='#edf0e9';
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    cx,
+    cy,
+    r,
+    0,
+    Math.PI*2
+  );
+
+  ctx.stroke();
+
+
+  if(pct>0){
+
+    ctx.strokeStyle=color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      cx,
+      cy,
+      r,
+      -Math.PI/2,
+      -Math.PI/2+
+      Math.PI*2*pct/100
+    );
+
+    ctx.stroke();
+
+  }
+
+}
+
+
+function drawBars(){
+
+  drawCanvas(
+    'barChart',
+    (ctx,w,h)=>{
+
+      const left=28;
+      const right=8;
+      const top=12;
+      const bottom=27;
+
+      const pw=
+        w-left-right;
+
+      const ph=
+        h-top-bottom;
+
+
+      const values=[];
+
+
+      for(
+        let i=6;
+        i>=0;
+        i--
+      ){
+
+        let d=
+          new Date(now);
+
+        d.setDate(
+          now.getDate()-i
+        );
+
+
+        values.push({
+          d,
+          c:counts(key(d))
+        });
+
+      }
+
+
+      const max=
+        Math.max(
+          1,
+          habits.length
+        );
+
+      const steps=4;
+
+
+      ctx.font='10px system-ui';
+
+      ctx.textAlign='right';
+
+      ctx.textBaseline='middle';
+
+
+      for(
+        let i=0;
+        i<=steps;
+        i++
+      ){
+
+        let y=
+          top+
+          ph*i/steps;
+
+
+        ctx.strokeStyle=
+          '#edf0e9';
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          left,
+          y
+        );
+
+        ctx.lineTo(
+          w-right,
+          y
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle=
+          '#899087';
+
+        ctx.fillText(
+          String(
+            Math.round(
+              max*(1-i/steps)
+            )
+          ),
+          left-6,
+          y
+        );
+
+      }
+
+
+      const slot=pw/7;
+
+      const bw=
+        Math.min(
+          23,
+          slot*.57
+        );
+
+
+      values.forEach(
+        (v,i)=>{
+
+          const bh=
+            ph*
+            v.c.done/max;
+
+          const x=
+            left+
+            i*slot+
+            (slot-bw)/2;
+
+          const y=
+            top+
+            ph-bh;
+
+
+          ctx.fillStyle=
+            key(v.d)===todayKey
+            ? '#55785e'
+            : '#9db59b';
+
+
+          if(bh>0){
+
+            ctx.beginPath();
+
+            ctx.roundRect(
+              x,
+              y,
+              bw,
+              bh,
+              4
+            );
+
+            ctx.fill();
+
+          }
+
+
+          ctx.fillStyle=
+            '#7b8278';
+
+          ctx.textAlign='center';
+
+          ctx.textBaseline='top';
+
+
+          ctx.fillText(
+            [
+              'S',
+              'M',
+              'T',
+              'W',
+              'T',
+              'F',
+              'S'
+            ][v.d.getDay()],
+            x+bw/2,
+            h-bottom+8
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
 function drawLine(){
- drawCanvas('lineChart',(ctx,w,h)=>{
-  const left=29,right=9,top=14,bottom=27,pw=w-left-right,ph=h-top-bottom;
-  const vals=[];
-  for(let i=29;i>=0;i--){let d=new Date(now);d.setDate(now.getDate()-i);let c=counts(key(d));vals.push({d,p:c.total?c.done/c.total*100:0});}
-  ctx.font='10px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
-  for(let i=0;i<=4;i++){let y=top+ph*i/4;ctx.strokeStyle='#edf0e9';ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();ctx.fillStyle='#899087';ctx.fillText(String(100-i*25),left-6,y);}
-  const pts=vals.map((v,i)=>({x:left+i*pw/(vals.length-1),y:top+ph*(1-v.p/100),p:v.p}));
-  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-  ctx.lineTo(pts[pts.length-1].x,top+ph);ctx.lineTo(pts[0].x,top+ph);ctx.closePath();ctx.fillStyle='#55785e16';ctx.fill();
-  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle='#55785e';ctx.lineWidth=2.5;ctx.stroke();
-  pts.forEach((p,i)=>{if(i%5===0||i===pts.length-1){ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle='#55785e';ctx.fill();}});
-  ctx.fillStyle='#7b8278';ctx.textAlign='center';ctx.textBaseline='top';
-  [0,5,10,15,20,25,29].forEach(i=>ctx.fillText(vals[i].d.getDate(),pts[i].x,h-bottom+8));
- });
+
+  drawCanvas(
+    'lineChart',
+    (ctx,w,h)=>{
+
+      const left=29;
+      const right=9;
+      const top=14;
+      const bottom=27;
+
+
+      const pw=
+        w-left-right;
+
+      const ph=
+        h-top-bottom;
+
+
+      const vals=[];
+
+
+      for(
+        let i=29;
+        i>=0;
+        i--
+      ){
+
+        let d=
+          new Date(now);
+
+        d.setDate(
+          now.getDate()-i
+        );
+
+
+        let c=
+          counts(key(d));
+
+
+        vals.push({
+          d,
+          p:
+            c.total
+            ? c.done/c.total*100
+            : 0
+        });
+
+      }
+
+
+      ctx.font='10px system-ui';
+
+      ctx.textAlign='right';
+
+      ctx.textBaseline='middle';
+
+
+      for(
+        let i=0;
+        i<=4;
+        i++
+      ){
+
+        let y=
+          top+
+          ph*i/4;
+
+
+        ctx.strokeStyle=
+          '#edf0e9';
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          left,
+          y
+        );
+
+        ctx.lineTo(
+          w-right,
+          y
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle=
+          '#899087';
+
+        ctx.fillText(
+          String(
+            100-i*25
+          ),
+          left-6,
+          y
+        );
+
+      }
+
+
+      const pts=
+        vals.map(
+          (v,i)=>({
+
+            x:
+              left+
+              i*pw/
+              (vals.length-1),
+
+            y:
+              top+
+              ph*
+              (1-v.p/100),
+
+            p:v.p
+
+          })
+        );
+
+
+      ctx.beginPath();
+
+
+      pts.forEach(
+        (p,i)=>
+          i
+          ? ctx.lineTo(
+              p.x,
+              p.y
+            )
+          : ctx.moveTo(
+              p.x,
+              p.y
+            )
+      );
+
+
+      ctx.lineTo(
+        pts[pts.length-1].x,
+        top+ph
+      );
+
+      ctx.lineTo(
+        pts[0].x,
+        top+ph
+      );
+
+      ctx.closePath();
+
+
+      ctx.fillStyle=
+        '#55785e16';
+
+      ctx.fill();
+
+
+      ctx.beginPath();
+
+
+      pts.forEach(
+        (p,i)=>
+          i
+          ? ctx.lineTo(
+              p.x,
+              p.y
+            )
+          : ctx.moveTo(
+              p.x,
+              p.y
+            )
+      );
+
+
+      ctx.strokeStyle=
+        '#55785e';
+
+      ctx.lineWidth=2.5;
+
+      ctx.stroke();
+
+
+      pts.forEach(
+        (p,i)=>{
+
+          if(
+            i%5===0 ||
+            i===pts.length-1
+          ){
+
+            ctx.beginPath();
+
+            ctx.arc(
+              p.x,
+              p.y,
+              3,
+              0,
+              Math.PI*2
+            );
+
+            ctx.fillStyle=
+              '#55785e';
+
+            ctx.fill();
+
+          }
+
+        }
+      );
+
+
+      ctx.fillStyle=
+        '#7b8278';
+
+      ctx.textAlign='center';
+
+      ctx.textBaseline='top';
+
+
+      [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        29
+      ].forEach(
+        i=>
+          ctx.fillText(
+            vals[i].d.getDate(),
+            pts[i].x,
+            h-bottom+8
+          )
+      );
+
+    }
+  );
+
 }
+
+
 function renderMonth(){
- const m=monthData();$('monthPct').textContent=m.pct+'%';
- $('monthFill').style.width=m.pct+'%';$('ringPct').textContent=m.pct+'%';
- $('monthDetail').textContent=m.done+' of '+m.possible+' check-ins completed';
- $('donutTotal').textContent=m.possible;$('doneNum').textContent=m.done;$('missNum').textContent=m.possible-m.done;
- $('monthStatus').textContent=dayNo===daysInMonth?'Month complete':'In progress';
- drawCanvas('ringChart',(ctx,w,h)=>drawRing(ctx,w,h,m.pct,'#55785e'));
- drawCanvas('donutChart',(ctx,w,h)=>{
-  const total=m.possible,done=m.done,rest=Math.max(0,total-done);
-  const size=Math.min(w*.77,h*.78),r=size/2-4,cx=w/2,cy=h/2;
-  ctx.lineWidth=16;ctx.lineCap='butt';ctx.strokeStyle='#edf0e9';
-  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
-  if(total>0&&done>0){ctx.strokeStyle='#55785e';ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*done/total);ctx.stroke();}
-  if(total>0&&rest>0){ctx.strokeStyle='#d88b7f';ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2+Math.PI*2*done/total,-Math.PI/2+Math.PI*2);ctx.stroke();}
- });
- const cal=$('calendar');cal.innerHTML='';
- ['S','M','T','W','T','F','S'].forEach(s=>{let e=document.createElement('div');e.className='weekday';e.textContent=s;cal.appendChild(e);});
- for(let i=0;i<new Date(year,month,1).getDay();i++)cal.appendChild(document.createElement('div'));
- for(let d=1;d<=daysInMonth;d++){
-  const k=key(new Date(year,month,d)),c=counts(k),e=document.createElement('div');
-  e.className='day'+(d>dayNo?' future':c.all?' done':c.total?' missed':'')+(k===todayKey?' today':'');
-  e.textContent=d;e.title=d>dayNo?'Future date':c.done+' of '+c.total+' habits complete';cal.appendChild(e);
- }
+
+  const m=
+    monthData();
+
+
+  $('monthPct').textContent=
+    m.pct+'%';
+
+  $('monthFill').style.width=
+    m.pct+'%';
+
+  $('ringPct').textContent=
+    m.pct+'%';
+
+
+  $('monthDetail').textContent=
+    m.done+
+    ' of '+
+    m.possible+
+    ' check-ins completed';
+
+
+  $('donutTotal').textContent=
+    m.possible;
+
+  $('doneNum').textContent=
+    m.done;
+
+  $('missNum').textContent=
+    m.possible-m.done;
+
+
+  $('monthStatus').textContent=
+    dayNo===daysInMonth
+    ? 'Month complete'
+    : 'In progress';
+
+
+  drawCanvas(
+    'ringChart',
+    (ctx,w,h)=>
+      drawRing(
+        ctx,
+        w,
+        h,
+        m.pct,
+        '#55785e'
+      )
+  );
+
+
+  drawCanvas(
+    'donutChart',
+    (ctx,w,h)=>{
+
+      const total=m.possible;
+
+      const done=m.done;
+
+      const rest=
+        Math.max(
+          0,
+          total-done
+        );
+
+
+      const size=
+        Math.min(
+          w*.77,
+          h*.78
+        );
+
+      const r=
+        size/2-4;
+
+      const cx=w/2;
+      const cy=h/2;
+
+
+      ctx.lineWidth=16;
+
+      ctx.lineCap='butt';
+
+      ctx.strokeStyle=
+        '#edf0e9';
+
+
+      ctx.beginPath();
+
+      ctx.arc(
+        cx,
+        cy,
+        r,
+        0,
+        Math.PI*2
+      );
+
+      ctx.stroke();
+
+
+      if(
+        total>0 &&
+        done>0
+      ){
+
+        ctx.strokeStyle=
+          '#55785e';
+
+        ctx.beginPath();
+
+        ctx.arc(
+          cx,
+          cy,
+          r,
+          -Math.PI/2,
+          -Math.PI/2+
+          Math.PI*2*
+          done/total
+        );
+
+        ctx.stroke();
+
+      }
+
+
+      if(
+        total>0 &&
+        rest>0
+      ){
+
+        ctx.strokeStyle=
+          '#d88b7f';
+
+        ctx.beginPath();
+
+        ctx.arc(
+          cx,
+          cy,
+          r,
+          -Math.PI/2+
+          Math.PI*2*
+          done/total,
+          -Math.PI/2+
+          Math.PI*2
+        );
+
+        ctx.stroke();
+
+      }
+
+    }
+  );
+
+
+  const cal=
+    $('calendar');
+
+  cal.innerHTML='';
+
+
+  [
+    'S',
+    'M',
+    'T',
+    'W',
+    'T',
+    'F',
+    'S'
+  ].forEach(
+    s=>{
+
+      let e=
+        document.createElement(
+          'div'
+        );
+
+      e.className='weekday';
+
+      e.textContent=s;
+
+      cal.appendChild(e);
+
+    }
+  );
+
+
+  for(
+    let i=0;
+    i<
+    new Date(
+      year,
+      month,
+      1
+    ).getDay();
+    i++
+  )
+    cal.appendChild(
+      document.createElement(
+        'div'
+      )
+    );
+
+
+  for(
+    let d=1;
+    d<=daysInMonth;
+    d++
+  ){
+
+    const k=
+      key(
+        new Date(
+          year,
+          month,
+          d
+        )
+      );
+
+    const c=
+      counts(k);
+
+    const e=
+      document.createElement(
+        'div'
+      );
+
+
+    e.className=
+      'day'+
+      (
+        d>dayNo
+        ? ' future'
+        : c.all
+        ? ' done'
+        : c.total
+        ? ' missed'
+        : ''
+      )+
+      (
+        k===todayKey
+        ? ' today'
+        : ''
+      );
+
+
+    e.textContent=d;
+
+
+    e.title=
+      d>dayNo
+      ? 'Future date'
+      : c.done+
+        ' of '+
+        c.total+
+        ' habits complete';
+
+
+    cal.appendChild(e);
+
+  }
+
 }
+
+
 function renderReports(){
- const el=$('habitReport');el.innerHTML='';
- if(!habits.length){el.textContent='Add a habit to see your monthly report.';return;}
- habits.forEach(h=>{
-  let n=0;
-  for(let d=1;d<=dayNo;d++)if(isDone(h.id,key(new Date(year,month,d))))n++;
-  const pct=Math.round(n/dayNo*100);
-  const row=document.createElement('div');row.className='report-row';
-  const top=document.createElement('div');top.className='report-top';
-  const name=document.createElement('strong');name.textContent=h.icon+' '+h.name;
-  const count=document.createElement('span');count.className='small';count.textContent=n+' / '+dayNo+' days';
-  top.append(name,count);
-  const track=document.createElement('div');track.className='progress';
-  const fill=document.createElement('div');fill.className='fill';fill.style.width=pct+'%';track.appendChild(fill);
-  const foot=document.createElement('div');foot.className='small';foot.style.marginTop='7px';foot.textContent=pct+'% of elapsed days completed';
-  row.append(top,track,foot);el.appendChild(row);
- });
+
+  const el=
+    $('habitReport');
+
+  el.innerHTML='';
+
+
+  if(!habits.length){
+
+    el.textContent=
+      'Add a habit to see your monthly report.';
+
+    return;
+
+  }
+
+
+  habits.forEach(
+    h=>{
+
+      let n=0;
+
+
+      for(
+        let d=1;
+        d<=dayNo;
+        d++
+      ){
+
+        if(
+          isDone(
+            h.id,
+            key(
+              new Date(
+                year,
+                month,
+                d
+              )
+            )
+          )
+        )
+          n++;
+
+      }
+
+
+      const pct=
+        Math.round(
+          n/dayNo*100
+        );
+
+
+      const row=
+        document.createElement(
+          'div'
+        );
+
+      row.className=
+        'report-row';
+
+
+      const top=
+        document.createElement(
+          'div'
+        );
+
+      top.className=
+        'report-top';
+
+
+      const name=
+        document.createElement(
+          'strong'
+        );
+
+      name.textContent=
+        h.icon+' '+h.name;
+
+
+      const count=
+        document.createElement(
+          'span'
+        );
+
+      count.className='small';
+
+      count.textContent=
+        n+' / '+dayNo+' days';
+
+
+      top.append(
+        name,
+        count
+      );
+
+
+      const track=
+        document.createElement(
+          'div'
+        );
+
+      track.className=
+        'progress';
+
+
+      const fill=
+        document.createElement(
+          'div'
+        );
+
+      fill.className='fill';
+
+      fill.style.width=
+        pct+'%';
+
+
+      track.appendChild(
+        fill
+      );
+
+
+      const foot=
+        document.createElement(
+          'div'
+        );
+
+      foot.className='small';
+
+      foot.style.marginTop='7px';
+
+      foot.textContent=
+        pct+
+        '% of elapsed days completed';
+
+
+      row.append(
+        top,
+        track,
+        foot
+      );
+
+
+      el.appendChild(row);
+
+    }
+  );
+
 }
+
+
 function render(){
- renderHabits();renderStats();renderMonth();renderReports();drawBars();drawLine();
+
+  renderHabits();
+
+  renderStats();
+
+  renderMonth();
+
+  renderReports();
+
+  drawBars();
+
+  drawLine();
+
 }
-$('addForm').addEventListener('submit',e=>{
- e.preventDefault();const name=$('habitInput').value.trim();if(!name)return;
- habits.push({id:nextId++,name,icon:'🌿'});$('habitInput').value='';save();render();
-});
-function selectPlan(plan,price){
- $('planNotice').textContent='Selected: '+plan+' ('+price+'). Demo only: no payment was taken and premium access was not activated.';
+
+
+$('addForm')
+.addEventListener(
+  'submit',
+  e=>{
+
+    e.preventDefault();
+
+
+    const name=
+      $('habitInput')
+      .value
+      .trim();
+
+
+    if(!name)
+      return;
+
+
+    habits.push({
+      id:nextId++,
+      name,
+      icon:'🌿'
+    });
+
+
+    $('habitInput').value='';
+
+    save();
+
+    render();
+
+  }
+);
+
+
+function selectPlan(
+  plan,
+  price
+){
+
+  $('planNotice').textContent=
+    'Selected: '+
+    plan+
+    ' ('+
+    price+
+    '). Demo only: no payment was taken and premium access was not activated.';
+
 }
+
+
 let resizeTimer;
-window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{drawBars();drawLine();const m=monthData();drawCanvas('ringChart',(ctx,w,h)=>drawRing(ctx,w,h,m.pct,'#55785e'));drawCanvas('donutChart',(ctx,w,h)=>{const total=m.possible,done=m.done,rest=Math.max(0,total-done),size=Math.min(w*.77,h*.78),r=size/2-4,cx=w/2,cy=h/2;ctx.lineWidth=16;ctx.strokeStyle='#edf0e9';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();if(total&&done){ctx.strokeStyle='#55785e';ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*done/total);ctx.stroke();}if(total&&rest){ctx.strokeStyle='#d88b7f';ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2+Math.PI*2*done/total,-Math.PI/2+Math.PI*2);ctx.stroke();}});},120);});
+
+
+window.addEventListener(
+  'resize',
+  ()=>{
+
+    clearTimeout(
+      resizeTimer
+    );
+
+
+    resizeTimer=
+      setTimeout(
+        ()=>{
+
+          drawBars();
+
+          drawLine();
+
+
+          const m=
+            monthData();
+
+
+          drawCanvas(
+            'ringChart',
+            (ctx,w,h)=>
+              drawRing(
+                ctx,
+                w,
+                h,
+                m.pct,
+                '#55785e'
+              )
+          );
+
+
+          drawCanvas(
+            'donutChart',
+            (ctx,w,h)=>{
+
+              const total=
+                m.possible;
+
+              const done=
+                m.done;
+
+              const rest=
+                Math.max(
+                  0,
+                  total-done
+                );
+
+
+              const size=
+                Math.min(
+                  w*.77,
+                  h*.78
+                );
+
+              const r=
+                size/2-4;
+
+              const cx=w/2;
+              const cy=h/2;
+
+
+              ctx.lineWidth=16;
+
+              ctx.strokeStyle=
+                '#edf0e9';
+
+              ctx.beginPath();
+
+              ctx.arc(
+                cx,
+                cy,
+                r,
+                0,
+                Math.PI*2
+              );
+
+              ctx.stroke();
+
+
+              if(
+                total &&
+                done
+              ){
+
+                ctx.strokeStyle=
+                  '#55785e';
+
+                ctx.beginPath();
+
+                ctx.arc(
+                  cx,
+                  cy,
+                  r,
+                  -Math.PI/2,
+                  -Math.PI/2+
+                  Math.PI*2*
+                  done/total
+                );
+
+                ctx.stroke();
+
+              }
+
+
+              if(
+                total &&
+                rest
+              ){
+
+                ctx.strokeStyle=
+                  '#d88b7f';
+
+                ctx.beginPath();
+
+                ctx.arc(
+                  cx,
+                  cy,
+                  r,
+                  -Math.PI/2+
+                  Math.PI*2*
+                  done/total,
+                  -Math.PI/2+
+                  Math.PI*2
+                );
+
+                ctx.stroke();
+
+              }
+
+            }
+          );
+
+        },
+        120
+      );
+
+  }
+);
+
+
+/* INITIAL LOAD */
+
 render();
+
+refreshAuthUI();
+
 </script>
+
 </body>
-</html>
+  </html>
