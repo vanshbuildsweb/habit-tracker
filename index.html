@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habit Bloom | Build Better Days</title>
+<style>
+:root {
+  --bg:#f7f6f0; --card:#fff; --ink:#292f29;
+  --muted:#777d74; --green:#55765d; --pale:#e7eee5;
+  --line:#e8e8df; --gold:#f4e5bd;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:Arial,Helvetica,sans-serif; padding:22px 15px 45px;
+}
+.app { max-width:850px; margin:auto; }
+header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:34px; }
+.logo { font-weight:800; font-size:21px; letter-spacing:-.8px; }
+.logo span { color:var(--green); }
+.tag { background:var(--pale); padding:9px 12px; border-radius:30px; font-size:12px; }
+.eyebrow { color:var(--green); font-weight:700; text-transform:uppercase; letter-spacing:2px; font-size:11px; }
+h1 { font-size:clamp(34px,8vw,55px); line-height:1.08; letter-spacing:-2px; margin:12px 0; }
+p { color:var(--muted); line-height:1.6; }
+.date { font-size:13px; margin-top:17px; }
+.stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:25px 0; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:17px; min-width:0; }
+.stat-label { color:var(--muted); font-size:12px; }
+.stat-num { font-size:27px; font-weight:800; margin:10px 0 4px; }
+.section { margin-top:24px; }
+.section-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; }
+h2 { font-size:19px; margin:0; letter-spacing:-.4px; }
+.small { font-size:12px; color:var(--muted); }
+button,input { font:inherit; }
+.primary { background:var(--green); color:white; border:0; border-radius:12px; padding:12px 15px; font-weight:700; cursor:pointer; }
+.secondary { background:var(--pale); color:var(--green); border:0; border-radius:11px; padding:10px 12px; font-weight:700; cursor:pointer; }
+.habit { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--line); }
+.habit:last-child { border-bottom:0; }
+.check { width:27px; height:27px; flex-shrink:0; border:1.5px solid #b7c5b7; border-radius:9px; background:white; color:white; cursor:pointer; }
+.check.done { background:var(--green); border-color:var(--green); }
+.habit-info { flex:1; min-width:0; }
+.habit-name { font-size:14px; font-weight:700; overflow-wrap:anywhere; }
+.habit-sub { font-size:12px; color:var(--muted); margin-top:5px; }
+.remove { background:none; border:0; color:#a1a49d; font-size:19px; cursor:pointer; }
+.add-row { display:flex; gap:8px; margin-top:14px; }
+input { min-width:0; width:100%; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fff; }
+.add-row input { flex:1; }
+.progress-track { height:9px; background:#edf0e9; border-radius:20px; overflow:hidden; margin:14px 0; }
+.progress-fill { height:100%; width:0; background:var(--green); border-radius:20px; transition:width .2s; }
+.bar-row { display:grid; grid-template-columns:44px 1fr 32px; align-items:center; gap:9px; margin:16px 0; font-size:12px; color:var(--muted); }
+.mini-track { height:9px; border-radius:20px; background:#edf0e9; overflow:hidden; }
+.mini-fill { height:100%; background:#91a68c; border-radius:20px; }
+.calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin-top:15px; }
+.day { background:#f0f1eb; border-radius:8px; text-align:center; padding:9px 0; font-size:12px; color:#74796f; }
+.day.done { background:var(--green); color:white; }
+.day.today { outline:2px solid #c6a56d; outline-offset:-2px; }
+.days-head { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:12px; }
+.days-head div { text-align:center; color:var(--muted); font-size:10px; }
+.plans { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.plan { position:relative; }
+.plan h3 { font-size:17px; margin:0 0 10px; }
+.price { font-size:35px; font-weight:800; letter-spacing:-1px; margin:8px 0; }
+.price small { font-size:12px; color:var(--muted); font-weight:400; letter-spacing:0; }
+.plan ul { padding-left:18px; color:var(--muted); font-size:13px; line-height:1.9; }
+.plan button { width:100%; margin-top:8px; }
+.featured { border:1.5px solid var(--green); }
+.ribbon { display:inline-block; color:var(--green); background:var(--pale); border-radius:20px; padding:6px 9px; font-size:10px; font-weight:700; margin-bottom:12px; }
+.notice { font-size:12px; background:#f5efdf; color:#796640; padding:12px; border-radius:12px; line-height:1.5; margin-top:13px; }
+footer { text-align:center; font-size:12px; color:var(--muted); padding:30px 0 0; }
+@media(max-width:420px) {
+  body { padding:17px 12px 35px; }
+  .card { padding:13px; border-radius:16px; }
+  .stat-num { font-size:23px; }
+  .plans { gap:9px; }
+  .plan h3 { font-size:15px; }
+  .price { font-size:30px; }
+  .calendar { gap:4px; }
+  .day { padding:8px 0; font-size:11px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">habit<span>bloom.</span></div>
+    <div class="tag">✦ Small steps, big growth</div>
+  </header>
+
+  <main>
+    <div class="eyebrow">Your personal growth space</div>
+    <h1>Become a little<br>better every day.</h1>
+    <p>Build routines, keep your streak alive, and celebrate every small win.</p>
+    <div class="date" id="todayDate"></div>
+
+    <div class="stats">
+      <div class="card">
+        <div class="stat-label">Today's progress</div>
+        <div class="stat-num" id="percent">0%</div>
+        <div class="small" id="completedText">0 of 4 done</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">Current streak 🔥</div>
+        <div class="stat-num" id="streak">0</div>
+        <div class="small">days in a row</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">Total habits</div>
+        <div class="stat-num" id="total">4</div>
+        <div class="small">keep growing</div>
+      </div>
+    </div>
+
+    <section class="section card">
+      <div class="section-head">
+        <div>
+          <h2>Today's habits 🌱</h2>
+          <div class="small" style="margin-top:6px">Show up for yourself today.</div>
+        </div>
+        <span class="tag" id="countTag">0 / 4</span>
+      </div>
+      <div id="habitList"></div>
+      <form class="add-row" id="addForm">
+        <input id="habitInput" maxlength="50" placeholder="Add a new habit..." required>
+        <button class="primary" type="submit">+ Add</button>
+      </form>
+    </section>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Monthly progress 📈</h2>
+        <span class="small" id="monthLabel"></span>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="small">Monthly completion</div>
+            <div class="stat-num" id="monthPercent">0%</div>
+          </div>
+          <div style="text-align:right">
+            <div class="small">Habits completed</div>
+            <strong id="monthDone">0</strong>
+          </div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="monthFill"></div></div>
+        <div class="small">Your daily wins add up over time.</div>
+        <div class="days-head">
+          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        </div>
+        <div class="calendar" id="calendar"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>This week's activity</h2>
+        <span class="small">Habits done per day</span>
+      </div>
+      <div class="card" id="weekChart"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Choose your plan ✨</h2>
+        <span class="small">Simple one-time payment</span>
+      </div>
+      <div class="plans">
+        <div class="card plan">
+          <h3>6 Months</h3>
+          <div class="price">₹69</div>
+          <div class="small">One-time payment</div>
+          <ul>
+            <li>6 months of access</li>
+            <li>Habit and streak tracking</li>
+            <li>Monthly progress</li>
+          </ul>
+          <button class="secondary" onclick="choosePlan('6 months','₹69')">Choose plan</button>
+        </div>
+        <div class="card plan featured">
+          <div class="ribbon">12 MONTHS</div>
+          <h3>1 Year</h3>
+          <div class="price">₹79</div>
+          <div class="small">One-time payment</div>
+          <ul>
+            <li>12 months of access</li>
+            <li>Habit and streak tracking</li>
+            <li>Monthly progress</li>
+          </ul>
+          <button class="primary" onclick="choosePlan('1 year','₹79')">Choose plan</button>
+        </div>
+      </div>
+      <div class="notice" id="planNotice">
+        Demo only: payment is not connected yet. Selecting a plan will not charge you or unlock paid access.
+      </div>
+    </div>
+  </main>
+  <footer>Made for your next little win 🌿<br>Habit Bloom · Grow at your own pace</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const today = new Date();
+const keyDate = d => d.getFullYear() + '-' +
+  String(d.getMonth()+1).padStart(2,'0') + '-' +
+  String(d.getDate()).padStart(2,'0');
+const todayKey = keyDate(today);
+let habits = [
+  {id:1,name:'Drink 8 glasses of water',icon:'💧'},
+  {id:2,name:'Read for 15 minutes',icon:'📚'},
+  {id:3,name:'Move your body',icon:'🏃'},
+  {id:4,name:'Sleep on time',icon:'🌙'}
+];
+let completed = {};
+let nextId = 5;
+let streak = 0;
+
+try {
+  const saved = JSON.parse(localStorage.getItem('habitBloomDemo') || '{}');
+  if (Array.isArray(saved.habits) && saved.habits.length) habits = saved.habits;
+  if (saved.completed && typeof saved.completed === 'object') completed = saved.completed;
+  if (Number.isInteger(saved.nextId)) nextId = saved.nextId;
+  if (Number.isInteger(saved.streak)) streak = saved.streak;
+} catch(e) {}
+
+$('todayDate').textContent = today.toLocaleDateString(undefined,{
+  weekday:'long',month:'long',day:'numeric',year:'numeric'
+});
+$('monthLabel').textContent = today.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+
+function save() {
+  try {
+    localStorage.setItem('habitBloomDemo',JSON.stringify({habits,completed,nextId,streak}));
+  } catch(e) {}
+}
+function isDone(id,date=todayKey) {
+  return !!(completed[date] && completed[date][id]);
+}
+function toggle(id) {
+  if (!completed[todayKey]) completed[todayKey] = {};
+  completed[todayKey][id] = !completed[todayKey][id];
+  save();
+  render();
+}
+function renderHabits() {
+  const list = $('habitList');
+  list.innerHTML = '';
+  habits.forEach(h => {
+    const done = isDone(h.id);
+    const row = document.createElement('div');
+    row.className = 'habit';
+    const check = document.createElement('button');
+    check.className = 'check' + (done?' done':'');
+    check.textContent = done ? '✓' : '';
+    check.setAttribute('aria-label','Toggle '+h.name);
+    check.onclick = () => toggle(h.id);
+
+    const info = document.createElement('div');
+    info.className = 'habit-info';
+    const name = document.createElement('div');
+    name.className = 'habit-name';
+    name.textContent = h.icon + ' ' + h.name;
+    const sub = document.createElement('div');
+    sub.className = 'habit-sub';
+    sub.textContent = done ? 'Completed today ✓' : 'One step at a time';
+    info.append(name,sub);
+
+    const del = document.createElement('button');
+    del.className = 'remove';
+    del.textContent = '×';
+    del.title = 'Delete habit';
+    del.onclick = () => {
+      if (confirm('Delete "'+h.name+'"?')) {
+        habits = habits.filter(x => x.id !== h.id);
+        save(); render();
+      }
+    };
+    row.append(check,info,del);
+    list.appendChild(row);
+  });
+}
+function renderStats() {
+  const count = habits.filter(h => isDone(h.id)).length;
+  const pct = habits.length ? Math.round(count/habits.length*100) : 0;
+  $('percent').textContent = pct+'%';
+  $('completedText').textContent = count+' of '+habits.length+' done';
+  $('countTag').textContent = count+' / '+habits.length;
+  $('total').textContent = habits.length;
+  $('streak').textContent = streak;
+}
+function renderCalendar() {
+  const el = $('calendar');
+  el.innerHTML = '';
+  const year = today.getFullYear(), month = today.getMonth();
+  const first = new Date(year,month,1).getDay();
+  const days = new Date(year,month+1,0).getDate();
+  for (let i=0;i<first;i++) {
+    const blank = document.createElement('div');
+    el.appendChild(blank);
+  }
+  for (let d=1;d<=days;d++) {
+    const date = new Date(year,month,d), key = keyDate(date);
+    const n = habits.filter(h => isDone(h.id,key)).length;
+    const cell = document.createElement('div');
+    cell.className = 'day'+(n>0?' done':'')+(key===todayKey?' today':'');
+    cell.textContent = d;
+    cell.title = n+' habits completed';
+    el.appendChild(cell);
+  }
+  let totalDone=0,totalPossible=0;
+  for (let d=1;d<=today.getDate();d++) {
+    const key=keyDate(new Date(year,month,d));
+    totalDone += habits.filter(h=>isDone(h.id,key)).length;
+    totalPossible += habits.length;
+  }
+  const pct=totalPossible?Math.round(totalDone/totalPossible*100):0;
+  $('monthPercent').textContent=pct+'%';
+  $('monthDone').textContent=totalDone;
+  $('monthFill').style.width=pct+'%';
+}
+function renderWeek() {
+  const el=$('weekChart'); el.innerHTML='';
+  const names=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dates=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    dates.push(d);
+  }
+  const vals=dates.map(d=>habits.filter(h=>isDone(h.id,keyDate(d))).length);
+  const max=Math.max(1,...vals);
+  dates.forEach((d,i)=>{
+    const row=document.createElement('div'); row.className='bar-row';
+    const label=document.createElement('span'); label.textContent=names[d.getDay()];
+    const track=document.createElement('div'); track.className='mini-track';
+    const fill=document.createElement('div'); fill.className='mini-fill';
+    fill.style.width=(vals[i]/Math.max(max,habits.length,1)*100)+'%';
+    track.appendChild(fill);
+    const value=document.createElement('span'); value.textContent=vals[i]+'/'+habits.length;
+    row.append(label,track,value); el.appendChild(row);
+  });
+}
+function render() {
+  renderHabits(); renderStats(); renderCalendar(); renderWeek();
+}
+$('addForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=$('habitInput').value.trim();
+  if(!name) return;
+  habits.push({id:nextId++,name,icon:'🌿'});
+  $('habitInput').value='';
+  save(); render();
+});
+function choosePlan(plan,price) {
+  $('planNotice').textContent='You selected the '+plan+' plan ('+price+'). Payment is not connected yet, so no money has been charged and no premium access has been activated.';
+  $('planNotice').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+render();
+</script>
+</body>
+</html>
